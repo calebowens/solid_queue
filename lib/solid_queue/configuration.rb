@@ -24,7 +24,8 @@ module SolidQueue
       case mode
       when :dispatch then dispatchers
       when :work     then workers
-      when :all      then dispatchers + workers
+      when :cron     then cron_enqueuers
+      when :all      then dispatchers + workers + cron_enqueuers
       else           raise "Invalid mode #{mode}"
       end
     end
@@ -46,6 +47,10 @@ module SolidQueue
           SolidQueue::Dispatcher.new(**dispatcher_options)
         end
       end
+    end
+
+    def cron_enqueuers
+      [SolidQueue::CronEnqueuer.new(cron_tasks)]
     end
 
     def max_number_of_threads
@@ -73,6 +78,25 @@ module SolidQueue
           .map { |options| options.dup.symbolize_keys }
       end
 
+      def cron_tasks
+        return @cron_tasks if @cron_tasks
+
+        tasks = cron_task_options.map { |options| SolidQueue::CronTask.new(options) }
+        valid_tasks, invalid_tasks = tasks.partition(&:valid?)
+
+        invalid_tasks.each do |task|
+          errors = task.errors.full_messages.join(",")
+
+          SolidQueue.logger.warn "[SolidQueue] Validation errors when parsing cron task:: #{errors}"
+        end
+
+        @cron_tasks = valid_tasks
+      end
+
+      def cron_task_options
+        @cron_task_options ||= (raw_config[:recurring_tasks] || [])
+          .map { |options| options.dup.deep_symbolize_keys }
+      end
 
       def load_config_from(file_or_hash)
         case file_or_hash

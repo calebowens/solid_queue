@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_dependency "rails", "~> 7.1"
+  spec.add_dependency "fugit", "~> 1.9"
   spec.add_development_dependency "debug"
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "puma"
