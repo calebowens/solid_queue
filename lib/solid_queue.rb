@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "fugit"
+
 require "solid_queue/version"
 require "solid_queue/engine"
 
@@ -21,6 +23,8 @@ require "solid_queue/pool"
 require "solid_queue/worker"
 require "solid_queue/dispatcher"
 require "solid_queue/supervisor"
+require "solid_queue/cron_enqueuer"
+require "solid_queue/cron_task"
 
 module SolidQueue
   mattr_accessor :logger, default: ActiveSupport::Logger.new($stdout)

@@ -17,17 +17,17 @@ module SolidQueue
     def enqueue
       wrap_in_app_executor do
         job_class
-          .set(**set)
+          .set(**(set || {}))
           .perform_later(*args, **(kwargs || {}))
       end
     end
 
     def next_due(previous_time: nil)
-      cron_schedule.next_time(previous_time).to_t
-    end
-
-    def key
-      job + schedule
+      if previous_time.nil?
+        cron_schedule.next_time.to_t
+      else
+        cron_schedule.next_time(previous_time).to_t
+      end
     end
 
     private
