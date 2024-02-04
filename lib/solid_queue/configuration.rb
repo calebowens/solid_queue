@@ -50,7 +50,7 @@ module SolidQueue
     end
 
     def cron_enqueuers
-      [SolidQueue::CronEnqueuer.new(cron_tasks)]
+      [SolidQueue::RecurringTaskEnqueuer.new(recurring_tasks)]
     end
 
     def max_number_of_threads
@@ -78,10 +78,10 @@ module SolidQueue
           .map { |options| options.dup.symbolize_keys }
       end
 
-      def cron_tasks
-        return @cron_tasks if @cron_tasks
+      def recurring_tasks
+        return @recurring_tasks if @recurring_tasks
 
-        tasks = cron_task_options.map { |options| SolidQueue::CronTask.new(options) }
+        tasks = recurring_task_options.map { |options| SolidQueue::RecurringTask.new(options) }
         valid_tasks, invalid_tasks = tasks.partition(&:valid?)
 
         invalid_tasks.each do |task|
@@ -90,11 +90,11 @@ module SolidQueue
           SolidQueue.logger.warn "[SolidQueue] Validation errors when parsing cron task:: #{errors}"
         end
 
-        @cron_tasks = valid_tasks
+        @recurring_tasks = valid_tasks
       end
 
-      def cron_task_options
-        @cron_task_options ||= (raw_config[:recurring_tasks] || [])
+      def recurring_task_options
+        @recurring_task_options ||= (raw_config[:recurring_tasks] || [])
           .map { |options| options.dup.deep_symbolize_keys }
       end
 

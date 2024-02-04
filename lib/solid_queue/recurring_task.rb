@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SolidQueue
-  class CronTask
+  class RecurringTask
     include ActiveModel::Model, AppExecutor
 
     attr_accessor :args, :kwargs, :job, :set, :schedule
