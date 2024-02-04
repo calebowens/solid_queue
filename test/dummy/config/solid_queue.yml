@@ -7,6 +7,9 @@ default: &default
   dispatchers:
     - polling_interval: 1
       batch_size: 500
+  recurring_tasks:
+    - job: PingJob
+      schedule: "* * * * * *"
 
 development:
   <<: *default
